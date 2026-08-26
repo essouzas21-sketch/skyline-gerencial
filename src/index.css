@@ -504,7 +504,8 @@ button, input, select {
 
 .device-table-wrap {
   overflow: auto;
-  max-height: calc(100vh - 240px);
+  max-height: 280px;
+  overscroll-behavior: contain;
 }
 
 table.sheet {

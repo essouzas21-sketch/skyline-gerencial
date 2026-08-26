@@ -1,4 +1,3 @@
-import { inRange } from "./dates";
 import { parseMoney } from "./format";
 
 export const CANAIS = {
@@ -7,8 +6,10 @@ export const CANAIS = {
 };
 
 export function parseEmissao(raw) {
-  const s = String(raw || "").trim();
-  const compact = s.match(/^(\d{2})(\d{2})(\d{4})/);
+  const s = String(raw ?? "").trim();
+  if (!s) return "";
+  // API: "02072026 00:00:00" → 02/07/2026
+  const compact = s.match(/^(\d{2})(\d{2})(\d{4})(?:\s|$)/);
   if (compact) return `${compact[3]}-${compact[2]}-${compact[1]}`;
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
@@ -47,7 +48,8 @@ export function mapNota(raw) {
     codtipoper: code,
     canal: canal.id,
     canalLabel: canal.label,
-    data: parseEmissao(raw.data_emissao ?? raw.DTNEG ?? raw.DTFATUR ?? raw.data),
+    data: parseEmissao(raw.data_emissao),
+    dataEmissao: raw.data_emissao ?? "",
     valor,
     qtde,
     itens: itens.length
@@ -59,7 +61,7 @@ export function loadVendas(rawRows) {
 }
 
 export function kpiVendas(notas, start, end) {
-  const inPeriod = (notas || []).filter((n) => inRange(n.data, start, end));
+  const inPeriod = (notas || []).filter((n) => n.data && n.data >= start && n.data <= end);
   const empty = { valor: 0, notas: 0, qtde: 0, itens: 0 };
   const ml = { ...empty };
   const loja = { ...empty };

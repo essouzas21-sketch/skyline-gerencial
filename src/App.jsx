@@ -2,17 +2,20 @@ import { useState } from "react";
 import { DataProvider } from "./context/DataContext";
 import Sidebar from "./components/Sidebar";
 import Overview from "./pages/Overview";
+import Faturamento from "./pages/Faturamento";
 import Producao from "./pages/Producao";
 import Cqe from "./pages/Cqe";
 
 const PAGES = {
   overview: Overview,
+  faturamento: Faturamento,
   producao: Producao,
   cqe: Cqe
 };
 
 const PAGE_LABELS = {
   overview: "Visão Geral",
+  faturamento: "Faturamento",
   producao: "Produção",
   cqe: "CQE"
 };

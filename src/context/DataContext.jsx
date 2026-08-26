@@ -12,6 +12,7 @@ import {
   loadTriagemRows,
   producaoByPanel
 } from "../lib/rules";
+import { kpiVendas, loadVendas } from "../lib/vendas";
 
 const DataContext = createContext(null);
 
@@ -24,22 +25,26 @@ export function DataProvider({ children }) {
   const [recRaw, setRecRaw] = useState([]);
   const [repRaw, setRepRaw] = useState([]);
   const [pecasRaw, setPecasRaw] = useState([]);
+  const [vendasRaw, setVendasRaw] = useState([]);
   const [status, setStatus] = useState("Conectando aos webhooks…");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    setStatus("Rastreando recebimento + reparo + peças…");
+    setStatus("Rastreando recebimento + reparo + peças + vendas…");
     try {
       const pecasPromise = fetchRows(API.PECAS).catch(() => []);
-      const [rec, rep, pecas] = await Promise.all([
+      const vendasPromise = fetchRows(API.VENDAS).catch(() => []);
+      const [rec, rep, pecas, vendas] = await Promise.all([
         fetchRows(API.RECEBIMENTO),
         fetchRows(API.REPARO),
-        pecasPromise
+        pecasPromise,
+        vendasPromise
       ]);
       setRecRaw(rec);
       setRepRaw(rep);
       setPecasRaw(pecas);
+      setVendasRaw(vendas);
       setLastUpdate(new Date());
       setStatus("");
     } catch (err) {
@@ -62,6 +67,11 @@ export function DataProvider({ children }) {
   const itens = useMemo(
     () => buildItens(recRows, repRaw, pecasRaw),
     [recRows, repRaw, pecasRaw]
+  );
+  const vendasNotas = useMemo(() => loadVendas(vendasRaw), [vendasRaw]);
+  const faturamento = useMemo(
+    () => kpiVendas(vendasNotas, dateStart, dateEnd),
+    [vendasNotas, dateStart, dateEnd]
   );
 
   const kpis = useMemo(
@@ -101,11 +111,13 @@ export function DataProvider({ children }) {
     cqeRows,
     itens,
     kpis,
+    faturamento,
     panels,
     counts: {
       recebimento: recRaw.length,
       reparo: repRaw.length,
-      pecas: pecasRaw.length
+      pecas: pecasRaw.length,
+      vendas: vendasRaw.length
     }
   };
 

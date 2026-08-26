@@ -331,6 +331,16 @@ button, input, select {
   gap: 12px;
 }
 
+.kpi-row-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.kpi .val.money {
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+}
+
 .kpi {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -533,7 +543,7 @@ table.sheet tbody tr:hover td { background: rgba(11, 142, 196, 0.06); }
   .app-shell { grid-template-columns: 1fr; }
   .side { display: none; }
   .mobile-nav { display: flex; }
-  .hero, .hero-nr, .grid-2, .grid-mid, .kpi-row, .panel-grid, .stage-cards {
+  .hero, .hero-nr, .grid-2, .grid-mid, .kpi-row, .kpi-row-4, .panel-grid, .stage-cards {
     grid-template-columns: 1fr;
   }
 }

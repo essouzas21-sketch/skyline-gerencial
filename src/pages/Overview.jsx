@@ -5,7 +5,7 @@ import Card, { BarList, StatusPill } from "../components/ui";
 import Topbar from "../components/Topbar";
 
 export default function Overview() {
-  const { kpis, dateStart, dateEnd, loading, error, status, counts } = useData();
+  const { kpis, faturamento, dateStart, dateEnd, loading, error, status, counts } = useData();
   const prod = kpis.producao;
   const cqeRate = formatPct(kpis.cqe.aprovado, kpis.cqe.total);
   const stageItems = Object.entries(kpis.byStep)
@@ -18,6 +18,33 @@ export default function Overview() {
       <Topbar />
       {loading && <div className="loading card">{status || "Carregando webhooks…"}</div>}
       {error && <div className="error card">{error}</div>}
+
+      <div className="kpi-row kpi-row-4">
+        <div className="kpi">
+          <div className="lab">Faturamento diário</div>
+          <div className="val money">{formatMoney(faturamento.total.valor)}</div>
+          <div className="hint">{formatPeriodBR(dateStart, dateEnd)} · valor total</div>
+        </div>
+        <div className="kpi">
+          <div className="lab">Mercado Livre · 1130</div>
+          <div className="val money">{formatMoney(faturamento.ml.valor)}</div>
+          <div className="hint">
+            {formatInt(faturamento.ml.notas)} notas · {formatPct(faturamento.ml.valor, faturamento.total.valor)}
+          </div>
+        </div>
+        <div className="kpi">
+          <div className="lab">Loja · 1191</div>
+          <div className="val money">{formatMoney(faturamento.loja.valor)}</div>
+          <div className="hint">
+            {formatInt(faturamento.loja.notas)} notas · {formatPct(faturamento.loja.valor, faturamento.total.valor)}
+          </div>
+        </div>
+        <div className="kpi">
+          <div className="lab">Notas</div>
+          <div className="val">{formatInt(faturamento.total.notas)}</div>
+          <div className="hint">{formatInt(faturamento.total.qtde)} itens</div>
+        </div>
+      </div>
 
       <div className="hero hero-nr">
         <Card>

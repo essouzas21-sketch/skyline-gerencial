@@ -3,6 +3,7 @@ import { addDaysISO, startOfMonthISO, todayISO } from "../lib/dates";
 
 const VIEWS = [
   { id: "overview", label: "Visão Geral" },
+  { id: "faturamento", label: "Faturamento" },
   { id: "producao", label: "Produção" },
   { id: "cqe", label: "CQE" }
 ];

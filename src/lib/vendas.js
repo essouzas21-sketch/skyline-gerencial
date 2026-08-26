@@ -82,6 +82,79 @@ function pickValorTotal(item) {
   return n != null ? n : 0;
 }
 
+function pickQtde(item) {
+  const n = Number(String(item?.qtde ?? 1).replace(",", "."));
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
+export function mapItemLine(item) {
+  if (!item || typeof item !== "object") return null;
+  const pn = String(item.pn ?? item.PN ?? "").trim();
+  const codprod = item.codprod ?? item.CODPROD ?? null;
+  return {
+    codprod,
+    pn: pn || "—",
+    descricao: String(item.descricao ?? item.DESCRICAO ?? "").trim() || "—",
+    qtde: pickQtde(item),
+    valor: pickValorTotal(item)
+  };
+}
+
+export function produtoKey(item) {
+  if (item?.pn && item.pn !== "—") return `pn:${item.pn}`;
+  if (item?.codprod != null && String(item.codprod).trim() !== "") return `cod:${item.codprod}`;
+  return `desc:${String(item?.descricao || "").trim().toLowerCase()}`;
+}
+
+export function rankProdutos(notas, limit = 20) {
+  const map = new Map();
+  (notas || []).forEach((n) => {
+    const notaId = String(n.nunota ?? n.numnota ?? "");
+    (n.linhas || []).forEach((item) => {
+      const key = produtoKey(item);
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          pn: item.pn || "—",
+          codprod: item.codprod,
+          descricao: item.descricao || "—",
+          qtde: 0,
+          valor: 0,
+          ml: 0,
+          loja: 0,
+          notaIds: new Set()
+        });
+      }
+      const row = map.get(key);
+      row.qtde += item.qtde;
+      row.valor += item.valor;
+      if (n.canal === "ml") row.ml += item.valor;
+      if (n.canal === "loja") row.loja += item.valor;
+      if (notaId) row.notaIds.add(notaId);
+      if (row.descricao === "—" && item.descricao && item.descricao !== "—") {
+        row.descricao = item.descricao;
+      }
+    });
+  });
+
+  const list = [...map.values()].map((row) => {
+    const { notaIds, ...rest } = row;
+    return {
+      ...rest,
+      notas: notaIds.size,
+      ticket: row.qtde ? row.valor / row.qtde : 0
+    };
+  });
+
+  const byQtde = [...list].sort((a, b) => b.qtde - a.qtde || b.valor - a.valor);
+  const byValor = [...list].sort((a, b) => b.valor - a.valor || b.qtde - a.qtde);
+  return {
+    byQtde: byQtde.slice(0, limit),
+    byValor: byValor.slice(0, limit),
+    produtos: list.length
+  };
+}
+
 export function mapNota(raw) {
   if (!raw || typeof raw !== "object") return null;
   const code = Number(
@@ -90,11 +163,9 @@ export function mapNota(raw) {
   const canal = CANAIS[code];
   if (!canal) return null;
   const itens = Array.isArray(raw.itens) ? raw.itens : [];
-  const valor = itens.reduce((sum, item) => sum + pickValorTotal(item), 0);
-  const qtde = itens.reduce((sum, item) => {
-    const n = Number(String(item?.qtde ?? 1).replace(",", "."));
-    return sum + (Number.isFinite(n) ? n : 0);
-  }, 0);
+  const linhas = itens.map(mapItemLine).filter(Boolean);
+  const valor = linhas.reduce((sum, item) => sum + item.valor, 0);
+  const qtde = linhas.reduce((sum, item) => sum + item.qtde, 0);
   const dataEmissao = pickField(raw, ["data_emissao", "DATA_EMISSAO"]) ?? "";
   return {
     nunota: raw.nunota ?? raw.NUNOTA ?? null,
@@ -106,7 +177,8 @@ export function mapNota(raw) {
     dataEmissao,
     valor,
     qtde,
-    itens: itens.length
+    itens: linhas.length,
+    linhas
   };
 }
 
@@ -155,6 +227,7 @@ export function kpiVendas(notas, start, end) {
 
   const byDay = [...byDayMap.values()].sort((a, b) => b.date.localeCompare(a.date));
   const span = vendasSpan(all);
+  const ranked = rankProdutos(inPeriod, 20);
 
   return {
     ml,
@@ -167,6 +240,9 @@ export function kpiVendas(notas, start, end) {
     },
     byDay,
     rows: inPeriod,
+    topQtde: ranked.byQtde,
+    topValor: ranked.byValor,
+    produtos: ranked.produtos,
     loaded: all.length,
     semData: all.filter((n) => !n.data).length,
     foraDoPeriodo: all.filter((n) => n.data && (n.data < start || n.data > end)).length,

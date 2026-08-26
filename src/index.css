@@ -563,6 +563,18 @@ table.sheet tbody tr:hover td { background: rgba(11, 142, 196, 0.06); }
   text-align: right;
 }
 
+.rank-table th:first-child,
+.rank-table td:first-child {
+  width: 2.2rem;
+  color: var(--muted);
+}
+
+.rank-table td:nth-child(n+3),
+.rank-table th:nth-child(n+3) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .mobile-nav {
   display: none;
   gap: 6px;

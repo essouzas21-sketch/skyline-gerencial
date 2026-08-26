@@ -5,9 +5,58 @@ import { useData } from "../context/DataContext";
 import Card from "../components/ui";
 import Topbar from "../components/Topbar";
 
+function ProdutoCell({ row }) {
+  const nome = String(row.descricao || "—");
+  const short = nome.length > 42 ? `${nome.slice(0, 42)}…` : nome;
+  return (
+    <td title={nome}>
+      <div style={{ fontWeight: 700 }}>{row.pn || "—"}</div>
+      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{short}</div>
+    </td>
+  );
+}
+
+function RankingTable({ rows, totalQtde, totalValor, sort }) {
+  const byQtde = sort === "qtde";
+  return (
+    <div className="device-table-wrap">
+      <table className="sheet rank-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Produto</th>
+            <th>Qtde</th>
+            <th>Valor</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={row.key}>
+              <td>{i + 1}</td>
+              <ProdutoCell row={row} />
+              <td style={{ fontWeight: byQtde ? 800 : 500 }}>{formatInt(row.qtde)}</td>
+              <td style={{ fontWeight: byQtde ? 500 : 800 }}>{formatMoney(row.valor)}</td>
+              <td>{formatPct(byQtde ? row.qtde : row.valor, byQtde ? totalQtde : totalValor)}</td>
+            </tr>
+          ))}
+          {!rows.length && (
+            <tr>
+              <td colSpan={5} className="empty">
+                Sem itens no período.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function Faturamento() {
   const { faturamento, dateStart, dateEnd, setDateStart, setDateEnd, loading, error, vendasError } = useData();
-  const { ml, loja, total, byDay, rows, loaded, foraDoPeriodo, semData, span } = faturamento;
+  const { ml, loja, total, byDay, rows, topQtde, topValor, produtos, loaded, foraDoPeriodo, semData, span } =
+    faturamento;
 
   return (
     <>
@@ -107,6 +156,15 @@ export default function Faturamento() {
           </table>
         </div>
       </Card>
+
+      <div className="grid-mid">
+        <Card title={`Mais vendidos · quantidade · top ${topQtde?.length || 0} de ${formatInt(produtos || 0)}`}>
+          <RankingTable rows={topQtde || []} totalQtde={total.qtde} totalValor={total.valor} sort="qtde" />
+        </Card>
+        <Card title={`Mais vendidos · valor · top ${topValor?.length || 0} de ${formatInt(produtos || 0)}`}>
+          <RankingTable rows={topValor || []} totalQtde={total.qtde} totalValor={total.valor} sort="valor" />
+        </Card>
+      </div>
 
       <Card title="Notas no período">
         <div className="device-table-wrap">

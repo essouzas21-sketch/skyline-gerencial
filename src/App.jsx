@@ -4,13 +4,17 @@ import Sidebar from "./components/Sidebar";
 import Overview from "./pages/Overview";
 import Producao from "./pages/Producao";
 import Cqe from "./pages/Cqe";
-import Itens from "./pages/Itens";
 
 const PAGES = {
   overview: Overview,
   producao: Producao,
-  cqe: Cqe,
-  itens: Itens
+  cqe: Cqe
+};
+
+const PAGE_LABELS = {
+  overview: "Visão Geral",
+  producao: "Produção",
+  cqe: "CQE"
 };
 
 function Shell() {
@@ -29,7 +33,7 @@ function Shell() {
               className={view === id ? "active" : ""}
               onClick={() => setView(id)}
             >
-              {id === "overview" ? "Visão Geral" : id === "producao" ? "Produção" : id === "cqe" ? "CQE" : "NR Itens"}
+              {PAGE_LABELS[id]}
             </button>
           ))}
         </div>

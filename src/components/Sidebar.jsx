@@ -4,8 +4,7 @@ import { addDaysISO, startOfMonthISO, todayISO } from "../lib/dates";
 const VIEWS = [
   { id: "overview", label: "Visão Geral" },
   { id: "producao", label: "Produção" },
-  { id: "cqe", label: "CQE" },
-  { id: "itens", label: "NR Itens" }
+  { id: "cqe", label: "CQE" }
 ];
 
 export default function Sidebar({ view, onView }) {

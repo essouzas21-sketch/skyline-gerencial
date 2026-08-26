@@ -5,7 +5,7 @@ import Card, { BarList, StatusPill } from "../components/ui";
 import Topbar from "../components/Topbar";
 
 export default function Overview() {
-  const { kpis, faturamento, dateStart, dateEnd, loading, error, status, counts } = useData();
+  const { kpis, faturamento, dateStart, dateEnd, loading, error, vendasError, status, counts } = useData();
   const prod = kpis.producao;
   const cqeRate = formatPct(kpis.cqe.aprovado, kpis.cqe.total);
   const stageItems = Object.entries(kpis.byStep)
@@ -18,6 +18,7 @@ export default function Overview() {
       <Topbar />
       {loading && <div className="loading card">{status || "Carregando webhooks…"}</div>}
       {error && <div className="error card">{error}</div>}
+      {vendasError && <div className="error card">Vendas: {vendasError}</div>}
 
       <div className="kpi-row kpi-row-4">
         <div className="kpi">

@@ -118,6 +118,53 @@ button, input, select {
   gap: 8px;
 }
 
+.date-filters {
+  display: grid;
+  gap: 8px;
+}
+
+.date-filters-field {
+  display: grid;
+  gap: 4px;
+}
+
+.date-filters-field span {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.date-filters-field input[type="date"] {
+  width: 100%;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  padding: 0 10px;
+  font-size: 0.82rem;
+}
+
+.date-filters-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.date-filters-btns .btn {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-dates {
+  display: none;
+  width: 100%;
+}
+
 .side-foot label,
 .filter-field span,
 .filter-field label {
@@ -543,6 +590,14 @@ table.sheet tbody tr:hover td { background: rgba(11, 142, 196, 0.06); }
   .app-shell { grid-template-columns: 1fr; }
   .side { display: none; }
   .mobile-nav { display: flex; }
+  .mobile-dates { display: block; }
+  .mobile-dates .date-filters {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+  }
+  .mobile-dates .date-filters-btns {
+    grid-column: 1 / -1;
+  }
   .hero, .hero-nr, .grid-2, .grid-mid, .kpi-row, .kpi-row-4, .panel-grid, .stage-cards {
     grid-template-columns: 1fr;
   }

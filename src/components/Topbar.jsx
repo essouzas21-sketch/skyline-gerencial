@@ -1,5 +1,6 @@
 import { useData } from "../context/DataContext";
 import { formatDateTimeBR, formatPeriodBR } from "../lib/dates";
+import DateFilters from "./DateFilters";
 
 export default function Topbar({ search, onSearch, searchPlaceholder, extra }) {
   const { lastUpdate, loading, reload, dateStart, dateEnd } = useData();
@@ -26,6 +27,9 @@ export default function Topbar({ search, onSearch, searchPlaceholder, extra }) {
         </button>
         {extra}
       </form>
+      <div className="mobile-dates">
+        <DateFilters idPrefix="top-date" />
+      </div>
       <div className="meta-right">
         <strong>GERENCIAL</strong>
         <div>

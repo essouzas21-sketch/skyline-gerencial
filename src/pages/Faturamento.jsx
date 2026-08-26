@@ -1,18 +1,20 @@
-import { formatDateBR, formatPeriodBR } from "../lib/dates";
+import { formatPeriodBR } from "../lib/dates";
 import { formatInt, formatMoney, formatPct } from "../lib/format";
+import { formatEmissaoBR } from "../lib/vendas";
 import { useData } from "../context/DataContext";
 import Card from "../components/ui";
 import Topbar from "../components/Topbar";
 
 export default function Faturamento() {
-  const { faturamento, dateStart, dateEnd, loading, error } = useData();
-  const { ml, loja, total, byDay, rows } = faturamento;
+  const { faturamento, dateStart, dateEnd, setDateStart, setDateEnd, loading, error, vendasError } = useData();
+  const { ml, loja, total, byDay, rows, loaded, foraDoPeriodo, semData, span } = faturamento;
 
   return (
     <>
       <Topbar />
       {loading && <div className="loading card">Carregando vendas…</div>}
       {error && <div className="error card">{error}</div>}
+      {vendasError && <div className="error card">Vendas: {vendasError}</div>}
 
       <div className="kpi-row kpi-row-4">
         <div className="kpi">
@@ -57,7 +59,7 @@ export default function Faturamento() {
             <tbody>
               {byDay.map((d) => (
                 <tr key={d.date}>
-                  <td>{formatDateBR(d.date)}</td>
+                  <td>{d.label || formatEmissaoBR(d.date)}</td>
                   <td>{formatMoney(d.ml)}</td>
                   <td>{formatMoney(d.loja)}</td>
                   <td style={{ fontWeight: 800 }}>{formatMoney(d.total)}</td>
@@ -78,7 +80,26 @@ export default function Faturamento() {
               {!byDay.length && (
                 <tr>
                   <td colSpan={6} className="empty">
-                    Nenhuma nota 1130/1191 no período.
+                    Nenhuma nota 1130/1191 no período {formatPeriodBR(dateStart, dateEnd)}.
+                    {loaded ? ` ${loaded} nota(s) na API` : " Nenhuma nota carregada."}
+                    {foraDoPeriodo ? ` · ${foraDoPeriodo} fora do filtro.` : ""}
+                    {semData ? ` · ${semData} sem data_emissao válida.` : ""}
+                    {span ? (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="btn ghost"
+                          style={{ height: 28, padding: "0 10px", fontSize: "0.75rem" }}
+                          onClick={() => {
+                            setDateStart(span.min);
+                            setDateEnd(span.max);
+                          }}
+                        >
+                          Ver {formatEmissaoBR(span.min)} a {formatEmissaoBR(span.max)}
+                        </button>
+                      </>
+                    ) : null}
                   </td>
                 </tr>
               )}
@@ -104,7 +125,7 @@ export default function Faturamento() {
             <tbody>
               {rows.slice(0, 300).map((n, i) => (
                 <tr key={`${n.nunota}-${i}`}>
-                  <td>{formatDateBR(n.data)}</td>
+                  <td title={String(n.dataEmissao || "")}>{formatEmissaoBR(n.dataEmissao || n.data)}</td>
                   <td>{n.numnota ?? n.nunota ?? "—"}</td>
                   <td>{n.canalLabel}</td>
                   <td>{n.codtipoper}</td>

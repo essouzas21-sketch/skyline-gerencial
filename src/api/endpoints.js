@@ -9,7 +9,9 @@ export const API = {
     "https://automacao.skylinemobile.com.br/webhook/873620b8-7633-4e79-99fe-39c8b504b9a4",
   LISTA_PRECOS: "https://automacao.skylinemobile.com.br/webhook/listaprecos",
   /** Notas de venda (codtipoper, data_emissao, itens.valor_total) */
-  VENDAS: "https://automacao.skylinemobile.com.br/webhook/Vendas"
+  VENDAS: import.meta.env.DEV
+    ? "/webhook/Vendas"
+    : "https://automacao.skylinemobile.com.br/webhook/Vendas"
 };
 
 export const FETCH_TIMEOUT_MS = 300000;

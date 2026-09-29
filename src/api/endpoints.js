@@ -1,6 +1,6 @@
 /** Mesmos webhooks do Skyline Dashboard / NR Timeline. */
 export const API = {
-  REPARO: "https://automacao.skylinemobile.com.br/webhook/fi",
+  REPARO: "https://lsinwtsolmmnnnuoziuv.supabase.co/functions/v1/relatorio-reparo",
   RECEBIMENTO:
     "https://automacao.skylinemobile.com.br/webhook/f16be280-a545-440c-80f4-9481b1dd06f6",
   MOVIMENTACOES:
